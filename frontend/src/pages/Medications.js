@@ -121,7 +121,7 @@ function Medications({ user, onLogout }) {
                 Add Medication
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md glass">
+            <DialogContent className="max-w-md glass" onInteractOutside={(e) => e.preventDefault()}>
               <DialogHeader>
                 <DialogTitle className="text-emerald-900">Add New Medication</DialogTitle>
               </DialogHeader>
