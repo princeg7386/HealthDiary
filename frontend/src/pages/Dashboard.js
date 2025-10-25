@@ -4,8 +4,13 @@ import { api } from '@/App';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Activity, Heart, Thermometer, Weight, Pill, TrendingUp } from 'lucide-react';
+import { Activity, Heart, Thermometer, Weight, Pill, TrendingUp, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
+import StreakDisplay from '@/components/StreakDisplay';
+import AchievementCard from '@/components/AchievementCard';
+import NotificationBanner from '@/components/NotificationBanner';
+import { calculateStreak, getUnlockedAchievements, getMotivationalMessage, achievements } from '@/utils/achievements';
+import { notificationManager } from '@/utils/notifications';
 
 function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
