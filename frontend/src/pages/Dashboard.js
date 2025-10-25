@@ -17,6 +17,9 @@ function Dashboard({ user, onLogout }) {
   const [stats, setStats] = useState(null);
   const [trends, setTrends] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [streak, setStreak] = useState(0);
+  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
+  const [allRecords, setAllRecords] = useState([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -24,12 +27,14 @@ function Dashboard({ user, onLogout }) {
 
   const loadDashboardData = async () => {
     try {
-      const [statsRes, trendsRes] = await Promise.all([
+      const [statsRes, trendsRes, recordsRes] = await Promise.all([
         api.get('/analytics/stats'),
-        api.get('/analytics/trends?days=7')
+        api.get('/analytics/trends?days=7'),
+        api.get('/health-records?days=365')
       ]);
       
       setStats(statsRes.data);
+      setAllRecords(recordsRes.data);
       
       const chartData = trendsRes.data.records.map(record => ({
         date: new Date(record.recorded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -40,11 +45,38 @@ function Dashboard({ user, onLogout }) {
       }));
       
       setTrends(chartData);
+      
+      // Calculate streak
+      const currentStreak = calculateStreak(recordsRes.data);
+      setStreak(currentStreak);
+      
+      // Calculate unlocked achievements
+      const statsWithStreak = { ...statsRes.data, streak: currentStreak };
+      const unlocked = getUnlockedAchievements(statsWithStreak);
+      setUnlockedAchievements(unlocked);
+      
+      // Show achievement toast if new
+      const lastShownAchievements = JSON.parse(localStorage.getItem('shownAchievements') || '[]');
+      const newAchievements = unlocked.filter(a => !lastShownAchievements.includes(a.id));
+      
+      if (newAchievements.length > 0) {
+        newAchievements.forEach(achievement => {
+          toast.success(`🎉 Achievement Unlocked: ${achievement.title}!`, {
+            description: achievement.description,
+            duration: 5000
+          });
+        });
+        localStorage.setItem('shownAchievements', JSON.stringify(unlocked.map(a => a.id)));
+      }
     } catch (error) {
       toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNotificationsEnabled = () => {
+    toast.success('Notifications enabled! You\'ll receive medication reminders.');
   };
 
   if (loading) {
