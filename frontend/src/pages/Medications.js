@@ -161,7 +161,7 @@ function Medications({ user, onLogout }) {
                     <SelectTrigger data-testid="med-frequency-select" className="border-emerald-200">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[100]">
                       <SelectItem value="daily">Daily</SelectItem>
                       <SelectItem value="twice-daily">Twice Daily</SelectItem>
                       <SelectItem value="thrice-daily">Thrice Daily</SelectItem>
